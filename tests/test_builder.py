@@ -6,7 +6,7 @@ def test_select():
     builder.select("name", "price")
     query = builder.build()
 
-    assert query.build() == "SELECT name, price FROM items"
+    assert query.to_sql() == "SELECT name, price FROM items"
 
 
 def test_where():
@@ -15,7 +15,7 @@ def test_where():
     builder.where("price > 10")
     query = builder.build()
 
-    assert query.build() == "SELECT name, price FROM items WHERE price > 10"
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price > 10"
 
 
 def test_where_and():
@@ -24,7 +24,7 @@ def test_where_and():
     builder.where(and_("price > 10", "price < 20"))
     query = builder.build()
 
-    assert query.build() == "SELECT name, price FROM items WHERE price > 10 AND price < 20"
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price > 10 AND price < 20"
 
 
 def test_where_or():
@@ -33,7 +33,7 @@ def test_where_or():
     builder.where(or_("price > 10", "price < 20"))
     query = builder.build()
 
-    assert query.build() == "SELECT name, price FROM items WHERE price > 10 OR price < 20"
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price > 10 OR price < 20"
 
 
 def test_where_not():
@@ -42,7 +42,7 @@ def test_where_not():
     builder.where(not_("price > 10"))
     query = builder.build()
 
-    assert query.build() == "SELECT name, price FROM items WHERE NOT price > 10"
+    assert query.to_sql() == "SELECT name, price FROM items WHERE NOT price > 10"
 
 
 def test_where_or_and_and():
@@ -57,7 +57,7 @@ def test_where_or_and_and():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items WHERE (price > 10 AND price < 20) OR (price > 30 AND price < 40)"
     )
 
@@ -75,7 +75,7 @@ def test_where_or_and_and_not():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items WHERE (price > 10 AND price < 20) OR (price > 30 AND price < 40) OR (NOT price > 50)"
     )
 
@@ -92,7 +92,7 @@ def test_where_or_and_or():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items WHERE (price > 10 AND price < 20) OR (price > 30 OR price < 40)"
     )
 
@@ -104,7 +104,7 @@ def test_join():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items JOIN categories ON items.catetory_id = categories.id"
     )
 
@@ -117,7 +117,7 @@ def test_join_join():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items JOIN categories ON items.catetory_id = categories.id JOIN orders ON items.id = orders.item_id"
     )
 
@@ -135,6 +135,6 @@ def test_join_subquery():
     query = builder.build()
 
     assert (
-        query.build()
+        query.to_sql()
         == "SELECT name, price FROM items JOIN (SELECT id FROM categories WHERE name = 'foo') AS ctg ON items.catetory_id = ctg.id"
     )
