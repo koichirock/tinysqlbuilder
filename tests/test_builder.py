@@ -101,7 +101,7 @@ def test_where_or_and_or():
 def test_join():
     builder = QueryBuilder("items")
     builder.select("name", "price")
-    builder.join(("categories", "items.catetory_id = categories.id"))
+    builder.join("categories", "items.catetory_id = categories.id")
     query = builder.build()
 
     assert (
@@ -113,8 +113,8 @@ def test_join():
 def test_join_join():
     builder = QueryBuilder("items")
     builder.select("name", "price")
-    builder.join(("categories", "items.catetory_id = categories.id"))
-    builder.join(("orders", "items.id = orders.item_id"))
+    builder.join("categories", "items.catetory_id = categories.id")
+    builder.join("orders", "items.id = orders.item_id")
     query = builder.build()
 
     assert (
@@ -132,7 +132,7 @@ def test_join_subquery():
 
     builder = QueryBuilder("items")
     builder.select("name", "price")
-    builder.join((subquery, "items.catetory_id = ctg.id"))
+    builder.join(subquery, "items.catetory_id = ctg.id")
     query = builder.build()
 
     assert (
@@ -220,3 +220,39 @@ def test_in_():
     query = builder.build()
 
     assert query.to_sql() == "SELECT name, price FROM items WHERE price IN (10, 20)"
+
+
+def test_left_outer_join():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.left_outer_join("categories", "items.catetory_id = categories.id")
+    query = builder.build()
+
+    assert (
+        query.to_sql()
+        == "SELECT name, price FROM items LEFT OUTER JOIN categories ON items.catetory_id = categories.id"
+    )
+
+
+def test_right_outer_join():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.right_outer_join("categories", "items.catetory_id = categories.id")
+    query = builder.build()
+
+    assert (
+        query.to_sql()
+        == "SELECT name, price FROM items RIGHT OUTER JOIN categories ON items.catetory_id = categories.id"
+    )
+
+
+def test_full_outer_join():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.full_outer_join("categories", "items.catetory_id = categories.id")
+    query = builder.build()
+
+    assert (
+        query.to_sql()
+        == "SELECT name, price FROM items FULL OUTER JOIN categories ON items.catetory_id = categories.id"
+    )

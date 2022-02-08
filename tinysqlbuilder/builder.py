@@ -1,41 +1,15 @@
-from typing import List, Optional, Tuple, Union
+from typing import Union
 
-from tinysqlbuilder.sql import Condition, build_condition
+from tinysqlbuilder.sql import (
+    Condition,
+    Query,
+    full_outer_join,
+    inner_join,
+    left_outer_join,
+    right_outer_join,
+)
 
 all = ["Query", "QueryBuilder"]
-
-
-class Query:
-    """SQL Query."""
-
-    def __init__(self, table: str):
-        self.table = table
-        self.columns: List[str] = []
-        self.joins: List[Tuple[Union[str, "Query"], Union[str, Condition]]] = []
-        self.condition: Optional[Union[str, Condition]] = None
-        self.alias: Optional[str] = None
-
-    def __str__(self) -> str:
-        return self.to_sql()
-
-    def to_sql(self) -> str:
-        """Build query string."""
-        query = f"SELECT {f', '.join(self.columns)}"
-        query += f" FROM {self.table}"
-        if self.joins:
-            for join in self.joins:
-                query += f" JOIN {join[0].subquery() if isinstance(join[0], Query) else join[0]}"
-                query += f" ON {build_condition(join[1])}"
-        if self.condition:
-            query += f" WHERE {build_condition(self.condition)}"
-        return query
-
-    def subquery(self) -> str:
-        """Build subquery string."""
-        query = f"({self.to_sql()})"
-        if self.alias:
-            query += f" AS {self.alias}"
-        return query
 
 
 class QueryBuilder:
@@ -54,9 +28,30 @@ class QueryBuilder:
         self._query.condition = condition
         return self
 
-    def join(self, condition: Tuple[Union[str, Query], Union[str, Condition]]) -> "QueryBuilder":
+    def join(self, table: Union[str, Query], condition: Union[str, Condition]) -> "QueryBuilder":
         """Add join."""
-        self._query.joins.append(condition)
+        self._query.joins.append(inner_join(table, condition))
+        return self
+
+    def left_outer_join(
+        self, table: Union[str, Query], condition: Union[str, Condition]
+    ) -> "QueryBuilder":
+        """Add left outer join."""
+        self._query.joins.append(left_outer_join(table, condition))
+        return self
+
+    def right_outer_join(
+        self, table: Union[str, Query], condition: Union[str, Condition]
+    ) -> "QueryBuilder":
+        """Add right outer join."""
+        self._query.joins.append(right_outer_join(table, condition))
+        return self
+
+    def full_outer_join(
+        self, table: Union[str, Query], condition: Union[str, Condition]
+    ) -> "QueryBuilder":
+        """Add full outer join."""
+        self._query.joins.append(full_outer_join(table, condition))
         return self
 
     def subquery(self, alias: str) -> "QueryBuilder":
