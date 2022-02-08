@@ -1,65 +1,8 @@
 from typing import List, Optional, Tuple, Union
 
-all = ["Operator", "and_", "or_", "not_", "Query", "QueryBuilder"]
+from tinysqlbuilder.condition import Condition, build_condition
 
-
-class Condition:
-    """Condition interface"""
-
-    def build_condition(self) -> str:
-        pass
-
-
-class _AndCondition(Condition):
-    """Add condition to the AND clause"""
-
-    def __init__(self, *condition: Union[str, Condition]) -> None:
-        self.condition = condition
-
-    def build_condition(self) -> str:
-        return " AND ".join(_build_condition(condition, inner=True) for condition in self.condition)
-
-
-class _OrCondition(Condition):
-    """Add condition to the OR clause"""
-
-    def __init__(self, *condition: Union[str, Condition]) -> None:
-        self.condition = condition
-
-    def build_condition(self) -> str:
-        return " OR ".join(_build_condition(condition, inner=True) for condition in self.condition)
-
-
-class _NotCondition(Condition):
-    """Add condition to the NOT clause"""
-
-    def __init__(self, condition: Union[str, Condition]) -> None:
-        self.condition = condition
-
-    def build_condition(self) -> str:
-        return f"NOT {_build_condition(self.condition, inner=True)}"
-
-
-def _build_condition(condition: Union[str, Condition], inner: bool = False) -> str:
-    """Build a operator"""
-    if isinstance(condition, str):
-        return condition
-    return f"({condition.build_condition()})" if inner else condition.build_condition()
-
-
-def and_(*conditions: Union[str, Condition]) -> _AndCondition:
-    """Add condition to the AND clause"""
-    return _AndCondition(*conditions)
-
-
-def or_(*conditions: Union[str, Condition]) -> _OrCondition:
-    """Add condition to the OR clause"""
-    return _OrCondition(*conditions)
-
-
-def not_(condition: Union[str, Condition]) -> _NotCondition:
-    """Add condition to the NOT clause"""
-    return _NotCondition(condition)
+all = ["Query", "QueryBuilder"]
 
 
 class Query:
@@ -82,9 +25,9 @@ class Query:
         if self.joins:
             for join in self.joins:
                 query += f" JOIN {join[0].subquery() if isinstance(join[0], Query) else join[0]}"
-                query += f" ON {_build_condition(join[1])}"
+                query += f" ON {build_condition(join[1])}"
         if self.condition:
-            query += f" WHERE {_build_condition(self.condition)}"
+            query += f" WHERE {build_condition(self.condition)}"
         return query
 
     def subquery(self) -> str:

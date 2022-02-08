@@ -1,4 +1,5 @@
-from tinysqlbuilder.builder import QueryBuilder, and_, not_, or_
+from tinysqlbuilder.builder import QueryBuilder
+from tinysqlbuilder.condition import and_, between, eq, ge, gt, in_, le, like, lt, not_, not_eq, or_
 
 
 def test_select():
@@ -138,3 +139,84 @@ def test_join_subquery():
         query.to_sql()
         == "SELECT name, price FROM items JOIN (SELECT id FROM categories WHERE name = 'foo') AS ctg ON items.catetory_id = ctg.id"
     )
+
+
+def test_equal():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(eq("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price = 10"
+
+
+def test_not_equal():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(not_eq("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price != 10"
+
+
+def test_gt():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(gt("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price > 10"
+
+
+def test_lt():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(lt("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price < 10"
+
+
+def test_ge():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(ge("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price >= 10"
+
+
+def test_le():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(le("price", 10))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price <= 10"
+
+
+def test_between():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(between("price", 10, 20))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price BETWEEN 10 AND 20"
+
+
+def test_like():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(like("name", "foo"))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE name LIKE 'foo'"
+
+
+def test_in_():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(in_("price", [10, 20]))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE price IN (10, 20)"
