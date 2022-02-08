@@ -1,5 +1,5 @@
 from tinysqlbuilder.builder import QueryBuilder
-from tinysqlbuilder.condition import and_, between, eq, ge, gt, in_, le, like, lt, not_, not_eq, or_
+from tinysqlbuilder.sql import and_, between, eq, ge, gt, in_, le, like, lt, not_, not_eq, or_
 
 
 def test_select():

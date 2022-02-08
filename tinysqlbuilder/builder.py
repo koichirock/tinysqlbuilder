@@ -1,6 +1,6 @@
 from typing import List, Optional, Tuple, Union
 
-from tinysqlbuilder.condition import Condition, build_condition
+from tinysqlbuilder.sql import Condition, build_condition
 
 all = ["Query", "QueryBuilder"]
 
