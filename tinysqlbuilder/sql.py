@@ -238,3 +238,13 @@ class Query:
         if self.alias:
             query += f" AS {self.alias}"
         return query
+
+
+def union(*queries: Query) -> str:
+    """Build UNION query."""
+    return " UNION ".join(query.to_sql() for query in queries)
+
+
+def union_all(*queries: Query) -> str:
+    """Build UNION ALL query."""
+    return " UNION ALL ".join(query.to_sql() for query in queries)
