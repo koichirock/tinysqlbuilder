@@ -150,6 +150,15 @@ def test_equal():
     assert query.to_sql() == "SELECT name, price FROM items WHERE price = 10"
 
 
+def test_equal_when_value_is_str():
+    builder = QueryBuilder("items")
+    builder.select("name", "price")
+    builder.where(eq("name", "foo"))
+    query = builder.build()
+
+    assert query.to_sql() == "SELECT name, price FROM items WHERE name = 'foo'"
+
+
 def test_not_equal():
     builder = QueryBuilder("items")
     builder.select("name", "price")

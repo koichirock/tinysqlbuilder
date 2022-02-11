@@ -85,49 +85,56 @@ def not_(condition: Union[str, Condition]) -> Condition:
 OpT = TypeVar("OpT")
 
 
+def enclose_in_single_quote_when_value_is_str(value: OpT) -> str:
+    """Enclose value in single quote when value is str"""
+    if isinstance(value, str):
+        return f"'{value}'"
+    return str(value)
+
+
 def eq(column: str, value: OpT) -> str:
     """Equal"""
-    return f"{column} = {value}"
+    return f"{column} = {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def not_eq(column: str, value: OpT) -> str:
     """Not equal"""
-    return f"{column} != {value}"
+    return f"{column} != {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def gt(column: str, value: OpT) -> str:
     """Greater than"""
-    return f"{column} > {value}"
+    return f"{column} > {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def lt(column: str, value: OpT) -> str:
     """Less than"""
-    return f"{column} < {value}"
+    return f"{column} < {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def ge(column: str, value: OpT) -> str:
     """Greater or equal"""
-    return f"{column} >= {value}"
+    return f"{column} >= {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def le(column: str, value: OpT) -> str:
     """Less or equal"""
-    return f"{column} <= {value}"
+    return f"{column} <= {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def between(column: str, value1: OpT, value2: OpT) -> str:
     """Between"""
-    return f"{column} BETWEEN {value1} AND {value2}"
+    return f"{column} BETWEEN {enclose_in_single_quote_when_value_is_str(value1)} AND {enclose_in_single_quote_when_value_is_str(value2)}"
 
 
 def like(column: str, value: OpT) -> str:
     """Like"""
-    return f"{column} LIKE '{value}'"
+    return f"{column} LIKE {enclose_in_single_quote_when_value_is_str(value)}"
 
 
 def in_(column: str, values: List[OpT]) -> str:
     """In"""
-    return f"{column} IN ({', '.join(map(lambda v: str(v), values))})"
+    return f"{column} IN ({', '.join(map(lambda v: enclose_in_single_quote_when_value_is_str(v), values))})"
 
 
 class Join:
