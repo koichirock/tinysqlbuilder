@@ -23,11 +23,22 @@ all = [
 ]
 
 
+class Function:
+    """Function interface"""
+
+    def __init__(self, stmt: str) -> None:
+        self._stmt = stmt
+
+    def build_function(self) -> str:
+        """Convert to SQL"""
+        return self._stmt
+
+
 class Condition:
     """Condition interface"""
 
     def build_condition(self) -> str:
-        pass
+        raise NotImplementedError
 
 
 class _AndCondition(Condition):
@@ -86,9 +97,17 @@ OpT = TypeVar("OpT")
 
 
 def enclose_in_single_quote_when_value_is_str(value: OpT) -> str:
-    """Enclose value in single quote when value is str"""
+    """Enclose value in single quote when value is str.
+    If use sql function (e.g. CAST), value must be `Function` instance.
+    """
     if isinstance(value, str):
         return f"'{value}'"
+    if isinstance(value, Function):
+        return value.build_function()
+    if isinstance(value, bool):
+        if value:
+            return "1"
+        return "0"
     return str(value)
 
 
@@ -141,7 +160,7 @@ class Join:
     """Join interface"""
 
     def build_join(self) -> str:
-        pass
+        raise NotImplementedError
 
 
 class _InnerJoin(Join):

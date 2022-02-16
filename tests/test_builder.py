@@ -1,5 +1,22 @@
+import pytest
+
 from tinysqlbuilder.builder import QueryBuilder
-from tinysqlbuilder.sql import and_, between, eq, ge, gt, in_, le, like, lt, not_, not_eq, or_
+from tinysqlbuilder.sql import (
+    Function,
+    and_,
+    between,
+    enclose_in_single_quote_when_value_is_str,
+    eq,
+    ge,
+    gt,
+    in_,
+    le,
+    like,
+    lt,
+    not_,
+    not_eq,
+    or_,
+)
 
 
 def test_select():
@@ -150,15 +167,6 @@ def test_equal():
     assert query.to_sql() == "SELECT name, price FROM items WHERE price = 10"
 
 
-def test_equal_when_value_is_str():
-    builder = QueryBuilder("items")
-    builder.select("name", "price")
-    builder.where(eq("name", "foo"))
-    query = builder.build()
-
-    assert query.to_sql() == "SELECT name, price FROM items WHERE name = 'foo'"
-
-
 def test_not_equal():
     builder = QueryBuilder("items")
     builder.select("name", "price")
@@ -265,3 +273,18 @@ def test_full_outer_join():
         query.to_sql()
         == "SELECT name, price FROM items FULL OUTER JOIN categories ON items.catetory_id = categories.id"
     )
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("foo", "'foo'"),
+        (1, "1"),
+        (1.0, "1.0"),
+        (True, "1"),
+        (False, "0"),
+        (Function("CAST(price, FLOAT)"), "CAST(price, FLOAT)"),
+    ],
+)
+def test_enclose_in_single_quote_when_value_is_str(value, expected):
+    assert enclose_in_single_quote_when_value_is_str(value) == expected

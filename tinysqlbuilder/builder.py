@@ -1,13 +1,6 @@
 from typing import Union
 
-from tinysqlbuilder.sql import (
-    Condition,
-    Query,
-    full_outer_join,
-    inner_join,
-    left_outer_join,
-    right_outer_join,
-)
+from .sql import Condition, Query, full_outer_join, inner_join, left_outer_join, right_outer_join
 
 all = ["Query", "QueryBuilder"]
 
